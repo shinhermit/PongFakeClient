@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 
 const int MainWindow::_dxRacket = 20;
-const int MainWindow::_timerInterval = 5000;
+const int MainWindow::_timerInterval = 1000;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -56,12 +56,12 @@ void MainWindow::_socketError(QAbstractSocket::SocketError errorCode)
 
 void MainWindow::_getDataSlot()
 {
-    qint32 index, nbRackets, nbPlayers, loserIndex, gameState, downCounter=-1;
+    qint32 index, nbRackets, nbPlayers, loserIndex, gameState, downCounter;
     QVector<QLineF> racketsLines;
     int dummy;
     QPointF p1_racket, p2_racket;
 
-    appendStatus("MainWindow::_getDataSlot(): next step = receive stream");
+    appendStatus("MainWindow::_getDataSlot(): next step = receive from stream");
     _socket_stream >> index >> nbRackets >> nbPlayers >> loserIndex >> gameState >> downCounter;
     for(int playerIndex=0; playerIndex < nbPlayers; ++playerIndex)
     {
