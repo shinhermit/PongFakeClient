@@ -31,7 +31,7 @@ public:
     void appendStatus(const QString & status);
 
 private slots:
-    void _socketError(QAbstractSocket::SocketError socketError);
+    void _socketError(QAbstractSocket::SocketError errorCode);
     void _getDataSlot();
     void _sendDataSlot();
 
