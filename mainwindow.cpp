@@ -58,12 +58,12 @@ void MainWindow::_getDataSlot()
     qint32 index, nbRackets, nbPlayers, loserIndex, gameState, downCounter;
     QVector<QLineF> racketsLines;
     int dummy;
-    QPointF p1_racket, p2_racket;
+    QPointF p1_racket, p2_racket, ballPos;
 
     _streamer.resetStatus();
 
     appendStatus("MainWindow::_getDataSlot(): next step = receive from stream");
-    _streamer >> index >> nbRackets >> nbPlayers >> loserIndex >> gameState >> downCounter;
+    _streamer >> ballPos >> index >> nbRackets >> nbPlayers >> loserIndex >> gameState >> downCounter;
     for(int playerIndex=0; playerIndex < nbPlayers; ++playerIndex)
     {
         _streamer >> dummy >> p1_racket >> p2_racket;
@@ -71,7 +71,10 @@ void MainWindow::_getDataSlot()
     }
 
     appendStatus("MainWindow::_getDataSlot(): data received");
-    appendStatus("Received index: "+QString::number(index)+",  nbRackets: "+QString::number(nbRackets)+" ...");
+    appendStatus("Received index"+QString::number(index)+
+                 ",  nbRackets: "+QString::number(nbRackets)+", nbPlayers: "+QString::number(nbPlayers)+
+                 ", loserIndex: "+QString::number(loserIndex)+", gameState: "+QString::number(gameState)+
+                 ", downCounter: "+QString::number(downCounter) );
 
     appendStatus("MainWindow::_getDataSlot(): next step = QTimer::singleShot");
     QTimer::singleShot( _timerInterval, this, SLOT(_sendDataSlot()) );
