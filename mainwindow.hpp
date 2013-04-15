@@ -38,6 +38,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
     QTcpSocket _socket;
+    QDataStream _streamer;
 
     static const int _dxRacket;
     static const int _timerInterval;

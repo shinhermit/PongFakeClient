@@ -6,7 +6,8 @@ const int MainWindow::_timerInterval = 5000;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    ui(new Ui::MainWindow),
+    _streamer(&_socket)
 {
     ui->setupUi(this);
 
@@ -58,13 +59,14 @@ void MainWindow::_getDataSlot()
     QVector<QLineF> racketsLines;
     int dummy;
     QPointF p1_racket, p2_racket;
-    QDataStream stream(&_socket);
+
+    _streamer.resetStatus();
 
     appendStatus("MainWindow::_getDataSlot(): next step = receive from stream");
-    stream >> index >> nbRackets >> nbPlayers >> loserIndex >> gameState >> downCounter;
+    _streamer >> index >> nbRackets >> nbPlayers >> loserIndex >> gameState >> downCounter;
     for(int playerIndex=0; playerIndex < nbPlayers; ++playerIndex)
     {
-        stream >> dummy >> p1_racket >> p2_racket;
+        _streamer >> dummy >> p1_racket >> p2_racket;
         racketsLines.push_back(QLineF(p1_racket, p2_racket));
     }
 
@@ -77,9 +79,9 @@ void MainWindow::_getDataSlot()
 
 void MainWindow::_sendDataSlot()
 {
-    QDataStream stream(&_socket);
+    _streamer.resetStatus();
 
     appendStatus("MainWindow::_sendDataSlot(): next step = send into stream");
-    stream << _dxRacket % (_dxRacket+1);
+    _streamer << _dxRacket % (_dxRacket+1);
     appendStatus("MainWindow::_sendDataSlot(): data sent");
 }
