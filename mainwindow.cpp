@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 
 const int MainWindow::_dxRacket = 20;
-const int MainWindow::_timerInterval = 5000;
+const int MainWindow::_timerInterval = 1000;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -57,21 +57,22 @@ void MainWindow::_getDataSlot()
 {
     qint32 index, nbRackets, nbPlayers, loserIndex, gameState, downCounter;
     QVector<QLineF> racketsLines;
-    int dummy;
+    qint32 id;
     QPointF p1_racket, p2_racket, ballPos;
 
     _streamer.resetStatus();
 
     appendStatus("MainWindow::_getDataSlot(): next step = receive from stream");
     _streamer >> ballPos >> index >> nbRackets >> nbPlayers >> loserIndex >> gameState >> downCounter;
-    for(int playerIndex=0; playerIndex < nbPlayers; ++playerIndex)
+    for(qint32 playerIndex=0; playerIndex < nbPlayers; ++playerIndex)
     {
-        _streamer >> dummy >> p1_racket >> p2_racket;
+        _streamer >> id >> p1_racket >> p2_racket;
         racketsLines.push_back(QLineF(p1_racket, p2_racket));
     }
 
     appendStatus("MainWindow::_getDataSlot(): data received");
-    appendStatus("Received index"+QString::number(index)+
+    appendStatus("Received ballPos: ("+QString::number(ballPos.x())+","+QString::number(ballPos.y())+")"+
+                 "index: "+QString::number(index)+
                  ",  nbRackets: "+QString::number(nbRackets)+", nbPlayers: "+QString::number(nbPlayers)+
                  ", loserIndex: "+QString::number(loserIndex)+", gameState: "+QString::number(gameState)+
                  ", downCounter: "+QString::number(downCounter) );
