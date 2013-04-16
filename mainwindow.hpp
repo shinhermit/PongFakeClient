@@ -20,15 +20,17 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    void appendStatus(const QString & status);
+
     void connectToServer(const QString & hostname,
                          const quint16 & port=6666);
 
-    void connectToServer(const QHostAddress & hostAdress=QHostAddress::LocalHost,
-                         const quint16 & port=6666);
+    void connectToServer(const QHostAddress & hostAdress,
+                         const quint16 & port);
 
-    void show();
-
-    void appendStatus(const QString & status);
+public slots:
+    void connectToServer();
 
 private slots:
     void _socketError(QAbstractSocket::SocketError errorCode);

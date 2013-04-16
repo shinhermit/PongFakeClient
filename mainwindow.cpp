@@ -1,7 +1,7 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
 
-const int MainWindow::_dxRacket = 20;
+const int MainWindow::_dxRacket = 3;
 const int MainWindow::_timerInterval = 1000;
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -35,16 +35,15 @@ void MainWindow::connectToServer(const QHostAddress &hostAdress, const quint16 &
     _socket.connectToHost(hostAdress, port);
 }
 
-void MainWindow::show()
+void MainWindow::connectToServer()
 {
-    connectToServer();
-
-    QMainWindow::show();
+    ui->statusText->setPlainText(". Fake client trying to connect to host\n");
+    _socket.connectToHost(QHostAddress::LocalHost, 6666);
 }
 
 void MainWindow::appendStatus(const QString &status)
 {
-    ui->statusText->setPlainText(ui->statusText->toPlainText()+". "+status+"\n");
+    ui->statusText->setPlainText( ". " + status + "\n" + ui->statusText->toPlainText() );
 }
 
 
@@ -62,7 +61,6 @@ void MainWindow::_getDataSlot()
 
     _streamer.resetStatus();
 
-    appendStatus("MainWindow::_getDataSlot(): next step = receive from stream");
     _streamer >> ballPos >> index >> nbRackets >> nbPlayers >> loserIndex >> gameState >> downCounter;
     for(qint32 playerIndex=0; playerIndex < nbPlayers; ++playerIndex)
     {
@@ -83,9 +81,12 @@ void MainWindow::_getDataSlot()
 
 void MainWindow::_sendDataSlot()
 {
+    qreal dx;
+
     _streamer.resetStatus();
 
-    appendStatus("MainWindow::_sendDataSlot(): next step = send into stream");
-    _streamer << _dxRacket % (_dxRacket+1);
-    appendStatus("MainWindow::_sendDataSlot(): data sent");
+    dx = 0;//_dxRacket % (_dxRacket+1);
+    _streamer << dx;
+
+    appendStatus( "MainWindow::_sendDataSlot(): sent dx = "+QString::number(dx) );
 }
