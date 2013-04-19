@@ -1,6 +1,8 @@
 #ifndef MAINWINDOW_HPP
 #define MAINWINDOW_HPP
 
+#include <cmath>
+
 #include <QMainWindow>
 #include <QTcpSocket>
 #include <QHostAddress>
@@ -41,9 +43,11 @@ private:
     Ui::MainWindow *ui;
     QTcpSocket _socket;
     QDataStream _streamer;
+    qreal _dxRacket;
+    qreal _dxRacketQuantum;
 
-    static const int _dxRacket;
-    static const int _timerInterval;
+    static const qreal _maxDxRacket;
+    static const qreal _timerInterval;
 };
 
 #endif // MAINWINDOW_HPP

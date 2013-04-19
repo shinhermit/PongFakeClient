@@ -1,13 +1,15 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
 
-const int MainWindow::_dxRacket = 3;
-const int MainWindow::_timerInterval = 1000;
+const qreal MainWindow::_maxDxRacket = 100;
+const qreal MainWindow::_timerInterval = 1000;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    _streamer(&_socket)
+    _streamer(&_socket),
+    _dxRacket(0),
+  _dxRacketQuantum(1)
 {
     ui->setupUi(this);
 
@@ -81,12 +83,13 @@ void MainWindow::_getDataSlot()
 
 void MainWindow::_sendDataSlot()
 {
-    qreal dx;
+    if( ::abs(_dxRacket) > _maxDxRacket )
+        _dxRacketQuantum = -_dxRacketQuantum;
 
     _streamer.resetStatus();
+    _streamer << _dxRacketQuantum;
 
-    dx = 0;//_dxRacket % (_dxRacket+1);
-    _streamer << dx;
+    _dxRacket += _dxRacketQuantum;
 
-    appendStatus( "MainWindow::_sendDataSlot(): sent dx = "+QString::number(dx) );
+    appendStatus( "MainWindow::_sendDataSlot(): sent dx = "+QString::number(_dxRacketQuantum) );
 }
