@@ -1,15 +1,13 @@
 #include "mainwindow.hpp"
 #include "ui_mainwindow.h"
 
-const qreal MainWindow::_maxDxRacket = 100;
 const qreal MainWindow::_timerInterval = 1000;
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
     _streamer(&_socket),
-    _dxRacket(0),
-  _dxRacketQuantum(1)
+    _dxRacket(0)
 {
     ui->setupUi(this);
 
@@ -43,6 +41,11 @@ void MainWindow::connectToServer()
     _socket.connectToHost(QHostAddress::LocalHost, 6666);
 }
 
+void MainWindow::setdx()
+{
+    _dxRacket = (qreal)ui->dx->value();
+}
+
 void MainWindow::appendStatus(const QString &status)
 {
     ui->statusText->setPlainText( ". " + status + "\n" + ui->statusText->toPlainText() );
@@ -60,22 +63,31 @@ void MainWindow::_getDataSlot()
     QVector<QLineF> racketsLines;
     qint32 id;
     QPointF p1_racket, p2_racket, ballPos;
+    QString vectorString("\n   [");
 
     _streamer.resetStatus();
 
     _streamer >> ballPos >> index >> nbRackets >> nbPlayers >> loserIndex >> gameState >> downCounter;
-    for(qint32 playerIndex=0; playerIndex < nbPlayers; ++playerIndex)
+    for(qint32 racketIndex=0; racketIndex < nbRackets; ++racketIndex)
     {
         _streamer >> id >> p1_racket >> p2_racket;
-        racketsLines.push_back(QLineF(p1_racket, p2_racket));
+        vectorString += QString::number(id)+", ("+
+                QString::number(p1_racket.x())+","+
+                QString::number(p1_racket.y())+","+
+                QString::number(p2_racket.x())+","+
+                QString::number(p2_racket.y())+")";
+        if(racketIndex != nbRackets-1)
+            vectorString += "\n    ";
+//        racketsLines.push_back(QLineF(p1_racket, p2_racket));
     }
+    vectorString += "]";
 
     appendStatus("MainWindow::_getDataSlot(): data received");
     appendStatus("Received ballPos: ("+QString::number(ballPos.x())+","+QString::number(ballPos.y())+")"+
                  "index: "+QString::number(index)+
                  ",  nbRackets: "+QString::number(nbRackets)+", nbPlayers: "+QString::number(nbPlayers)+
                  ", loserIndex: "+QString::number(loserIndex)+", gameState: "+QString::number(gameState)+
-                 ", downCounter: "+QString::number(downCounter) );
+                 ", downCounter: "+QString::number(downCounter)+vectorString );
 
     appendStatus("MainWindow::_getDataSlot(): next step = QTimer::singleShot");
     QTimer::singleShot( _timerInterval, this, SLOT(_sendDataSlot()) );
@@ -83,13 +95,11 @@ void MainWindow::_getDataSlot()
 
 void MainWindow::_sendDataSlot()
 {
-    if( ::abs(_dxRacket) > _maxDxRacket )
-        _dxRacketQuantum = -_dxRacketQuantum;
-
     _streamer.resetStatus();
-    _streamer << _dxRacketQuantum;
+    _streamer << _dxRacket;
 
-    _dxRacket += _dxRacketQuantum;
+    _dxRacket = 0;
 
-    appendStatus( "MainWindow::_sendDataSlot(): sent dx = "+QString::number(_dxRacketQuantum) );
+    if(_dxRacket != 0)
+        appendStatus( "MainWindow::_sendDataSlot(): sent dx = "+QString::number(_dxRacket) );
 }

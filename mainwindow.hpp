@@ -33,6 +33,7 @@ public:
 
 public slots:
     void connectToServer();
+    void setdx();
 
 private slots:
     void _socketError(QAbstractSocket::SocketError errorCode);
@@ -44,9 +45,7 @@ private:
     QTcpSocket _socket;
     QDataStream _streamer;
     qreal _dxRacket;
-    qreal _dxRacketQuantum;
 
-    static const qreal _maxDxRacket;
     static const qreal _timerInterval;
 };
 
